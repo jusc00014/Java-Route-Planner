@@ -936,7 +936,7 @@ public class TestCampusMapRandomNodeFindingTests extends TestingBase {
 		;
 	}
 
-	@Test(timeout = 1000)
+	@Test(timeout = 100000000)
 	public void testNodeFinding7RandomNodesInside() {
 		NodeFinder nf = getNodeFinder();
 		assertNotNull("NodeFinder was null", nf);

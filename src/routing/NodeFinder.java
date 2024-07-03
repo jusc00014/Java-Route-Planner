@@ -10,5 +10,4 @@ public interface NodeFinder {
 	 * @return The node closest to c in the navigation graph.
 	 */
 	public Node getNodeForCoordinates(Coordinate c);
-
 }

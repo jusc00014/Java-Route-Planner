@@ -24,10 +24,11 @@ public class Factory {
 	 */
 	public static Graph createGraphFromMap(String fileName) throws IOException {
 		MyGraph g = new MyGraph();
-		List<Node> nodes = new ArrayList<Node>();	//Liste alle Knoten in einem Array auf, sodass wir darüber iterieren können
+		//List<Node> nodes = new ArrayList<Node>();	//Liste alle Knoten in einem Array auf, sodass wir darüber iterieren können
+		Map<Long, Node> nodes = new HashMap<>(); 
 		Map<Long, List<Edge>> incommingEdges = new HashMap<>();	//Mape ID zu einer Liste von incomming edges
 		Map<Long, List<Edge>> outgoingEdges = new HashMap<>();
-		Map<Long, coordinates> koordinaten = new HashMap<>();
+		Map<Long, Coordinate> koordinaten = new HashMap<>();
 		try {
 			FileReader read = new FileReader(fileName);
 			BufferedReader buf = new BufferedReader(read);
@@ -37,6 +38,7 @@ public class Factory {
 			double miny = 0;
 			double maxy = 0;
 			boolean anz = true;
+			int num = 0;
 			while ((line = buf.readLine())!= null) { //Solange noch Zeilen gelesen werden
 				line = line.trim();
 				String[] parts = line.split("\\s+");
@@ -45,52 +47,64 @@ public class Factory {
 					List<Edge> outedges = new ArrayList<Edge>();
 					MyNode k = new MyNode();
 					k.id = Long.parseLong(parts[1]);
-					k.x = Double.parseDouble(parts[2]);
-					k.y = Double.parseDouble(parts[3]);
+					double a = Double.parseDouble(parts[2]);
+					double b = Double.parseDouble(parts[3]);
+					k.lati = a;
+					k.longi = b;
 					if (anz) {
-						maxx = k.x;
-						minx = k.x;
-						maxy = k.y;
-						miny = k.y;
+						maxx = a;
+						minx = a;
+						maxy = b;
+						miny = b;
 						anz = false;
 					} else {
-						maxx = Math.max(maxx, k.x);
-						minx = Math.min(minx, k.x);
-						maxy = Math.max(maxy, k.y);
-						miny = Math.min(miny, k.y);
+						maxx = Math.max(maxx, a);
+						minx = Math.min(minx, a);
+						maxy = Math.max(maxy, b);
+						miny = Math.min(miny, b);
 					}
-					nodes.add(k);
+					nodes.put(k.id, k);
 					incommingEdges.put(k.id, inedges);
 					outgoingEdges.put(k.id, outedges);
-					coordinates c = new coordinates(k.x, k.y);
+					Coordinate c = new Coordinate(a, b);
 					koordinaten.put(k.id, c);
+					k.c = c;
+					List<Edge> edin = new ArrayList<Edge>();
+					k.ein = edin;
+					List<Edge> edout = new ArrayList<Edge>();
+					k.eout = edout;
 				} else if (parts[0].equals("E")) {
 					MyEdge e = new MyEdge();
-					e.s = Long.parseLong(parts[1]);
-					e.d = Long.parseLong(parts[2]);
+					e.s = nodes.get(Long.parseLong(parts[1]));
+					e.d = nodes.get(Long.parseLong(parts[2]));
 					e.scd = parts[3].equals("1");
 					e.dcs = parts[4].equals("1");
 					e.sbd = parts[5].equals("1");
 					e.dbs = parts[6].equals("1");
 					e.sfd = parts[7].equals("1");
 					e.dfs = parts[8].equals("1");
-					coordinates c = koordinaten.get(e.s);
-					coordinates d = koordinaten.get(e.d);
-					double x = Math.abs(c.getx() - d.getx());
-					double y = Math.abs(c.gety() - d.gety());
-					e.length = Math.sqrt(x*x + y*y);
-					if (e.scd != false || e.sbd != false || e.sfd != false) {
-						outgoingEdges.get(e.s).add(e);
-						incommingEdges.get(e.d).add(e);
-					}
-					if (e.dcs != false || e.dbs != false || e.dfs != false) {
-						outgoingEdges.get(e.s).add(e);
-						incommingEdges.get(e.d).add(e);
-					}
+					Coordinate c = (e.s).getCoordinate();
+					Coordinate d = (e.d).getCoordinate();
+					e.length = routing.Coordinate.distance(c.getLatitude(), c.getLongitude(), d.getLongitude(), d.getLongitude());
+					MyNode src = (MyNode) (e.s);
+					MyNode dst = (MyNode) (e.d);
+					num +=2;
+					src.eout.add(e);
+					dst.ein.add(e);
+					src.ein.add(e);
+					dst.eout.add(e);
 				} else {
+					buf.close();
+					read.close();
 					throw new IllegalArgumentException("File has wrong format");
 				}
 			}
+			System.out.println(minx + " -> " + maxx + "    " + miny + " -> " + maxy);
+			List <Long> idList = new ArrayList<>();
+			for (Long key : nodes.keySet()) {
+				idList.add(key);
+			}
+			g.idList = idList;
 			g.Edgesin = incommingEdges;
 			g.Edgesout = outgoingEdges;
 			g.coo = koordinaten;
@@ -99,15 +113,25 @@ public class Factory {
 			g.Mx = maxx;
 			g.My = maxy;
 			g.my = miny;
+			g.nume = num;
 			buf.close();
 			read.close();
 		} catch (IOException e) {
 			throw new FileNotFoundException(e.getMessage());
 		}
+
+	/*	//Zu testzwecken
+		for (Map.Entry<Long, Node> entry : (g.kn).entrySet()) {
+			MyNode k = (MyNode) entry.getValue();
+			System.out.println("Knoten: " + k.getId());
+			for (Edge eg : k.eout) {
+				System.out.println("from " + eg.getStart() + " to " + eg.getEnd());
+			}
+		} */
 		return (g);
 	}
 
-	/**
+	/*
 	 * Return a node finder algorithm for the graph g. The graph argument allows
 	 * the node finder to build internal data structures.
 	 *
@@ -116,8 +140,9 @@ public class Factory {
 	 * @return A node finder algorithm for that graph.
 	 */
 	public static NodeFinder createNodeFinder(Graph g) {
-		// TODO: Implement me.
-		return null;
+		NextNode find = new NextNode();
+		find.g = g;
+		return(find);
 	}
 
 	/**
