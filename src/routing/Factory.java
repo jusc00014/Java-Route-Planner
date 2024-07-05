@@ -99,7 +99,6 @@ public class Factory {
 					throw new IllegalArgumentException("File has wrong format");
 				}
 			}
-			System.out.println(minx + " -> " + maxx + "    " + miny + " -> " + maxy);
 			List <Long> idList = new ArrayList<>();
 			for (Long key : nodes.keySet()) {
 				idList.add(key);
@@ -140,8 +139,8 @@ public class Factory {
 	 * @return A node finder algorithm for that graph.
 	 */
 	public static NodeFinder createNodeFinder(Graph g) {
-		NextNode find = new NextNode();
-		find.g = g;
+		ClosestNode find = new ClosestNode();
+		find.g = (MyGraph) g;
 		return(find);
 	}
 

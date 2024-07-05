@@ -26,13 +26,13 @@ public class MyGraph implements Graph {
 
     @Override
     public Coordinate getNWCoordinate() {
-        Coordinate nw = new Coordinate(Mx, My);
+        Coordinate nw = new Coordinate(Mx, my);
         return(nw);
     }
 
     @Override
     public Coordinate getSECoordinate() {
-        Coordinate se = new Coordinate(mx, my);
+        Coordinate se = new Coordinate(mx, My);
         return(se);
     }
 
