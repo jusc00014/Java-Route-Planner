@@ -167,8 +167,8 @@ public class Factory {
 	 * @return A routing algorithm suitable for that graph.
 	 */
 	public static RoutingAlgorithm createRoutingAlgorithm(Graph g) {
-		// TODO: Implement me.
-		return null;
+		RoutingAlgorithm alg = new Routalg();
+		return(alg);
 	}
 
 }
