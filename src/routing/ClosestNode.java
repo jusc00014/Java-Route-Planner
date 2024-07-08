@@ -16,8 +16,8 @@ public class ClosestNode implements NodeFinder {
 
 
     public int findSquare(Coordinate c){
-        int y = (int) (c.getLatitude()*1000);
-        int x = (int) (c.getLongitude()*1000);
+        int y = (int) ((c.getLatitude()+90)*1000);
+        int x = (int) ((c.getLongitude()+180)*1000);
         y = y-s;
         x = x-w;
         return(y*col+x);
@@ -47,8 +47,8 @@ public class ClosestNode implements NodeFinder {
     }
 
     public int nearestsquare(Coordinate c) {
-        int y = (int) (c.getLatitude()*1000);
-        int x = (int) (c.getLongitude()*1000);
+        int y = (int) ((c.getLatitude()+90)*1000);
+        int x = (int) ((c.getLongitude()+180)*1000);
         y = y-s;
         x = x-w;
         int squ = y*col+x;
@@ -104,10 +104,10 @@ public class ClosestNode implements NodeFinder {
     }
 
     public Node durchsuchealle(Coordinate c, Coordinate low, Coordinate up, int ind){
-        int sn = (int) (low.getLatitude()*1000-s);
-        int we = (int) (low.getLongitude()*1000-w);
-        int boundn = (int) (up.getLatitude()*1000-s);
-        int bounde = (int) (up.getLongitude()*1000-w);
+        int sn = (int) ((low.getLatitude()+90)*1000-s);
+        int we = (int) ((low.getLongitude()+180)*1000-w);
+        int boundn = (int) ((up.getLatitude()+90)*1000-s);
+        int bounde = (int) ((up.getLongitude()+180)*1000-w);
         sn = Math.max(0, sn);
         we = Math.max(0,we);
         boundn = Math.min(n, boundn);
@@ -145,12 +145,12 @@ public class ClosestNode implements NodeFinder {
     @Override
     public Node getNodeForCoordinates(Coordinate c) {
         Coordinate d = g.getNWCoordinate();
-        n = (int) (d.getLatitude()*1000) + 1;
-        w = (int) (d.getLongitude()*1000);
+        n = (int) ((d.getLatitude()+90)*1000) + 1;
+        w = (int) ((d.getLongitude()+180)*1000);
         Coordinate ttf = g.getNWCoordinate();
         d = g.getSECoordinate();
-        s = (int) (d.getLatitude()*1000);
-        e = (int) (d.getLongitude()*1000) + 1;
+        s = (int) ((d.getLatitude()+90)*1000);
+        e = (int) ((d.getLongitude()+180)*1000) + 1;
         rows = n-s;
         col = e-w;
         sq = new ArrayList[rows*col];
